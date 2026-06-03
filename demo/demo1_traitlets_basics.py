@@ -266,6 +266,7 @@ class MetaPerson(HasTraits):
     name = Unicode().tag(description="用户姓名", category="基本信息")
     age = Int().tag(description="用户年龄", min=0, max=150, category="基本信息")
     score = Float().tag(description="用户得分", min=0.0, max=100.0, category="评分")
+    sax = Unicode()
 
     def print_traits_info(self):
         for trait_name, trait_obj in self.class_traits().items():
@@ -274,6 +275,16 @@ class MetaPerson(HasTraits):
             desc = trait_obj.metadata.get("description", "无描述")
             category = trait_obj.metadata.get("category", "未分类")
             print(f"  {trait_name}: {desc} (分类: {category})")
+
+    # def print_traits_info(self):
+    #     # 只获取带有自定义 metadata 的 trait，自动排除框架内部属性
+    #     for trait_name, trait_obj in self.traits().items():
+    #         # 如果没有任何自定义 tag，说明不是用户定义的业务属性
+    #         if not trait_obj.metadata:
+    #             continue
+    #         desc = trait_obj.metadata.get("description", "无描述")
+    #         category = trait_obj.metadata.get("category", "未分类")
+    #         print(f"  {trait_name}: {desc} (分类: {category})")
 
 
 def test_metadata():
@@ -296,10 +307,10 @@ if __name__ == "__main__":
 
     # test_basic()
     # test_defaults()
-    test_observe()
+    # test_observe()
     # test_validate()
     # test_cross_validate()
-    # test_metadata()
+    test_metadata()
 
     # print("=" * 60)
     # print("  恭喜！你已经了解了 traitlets 的基础知识")
