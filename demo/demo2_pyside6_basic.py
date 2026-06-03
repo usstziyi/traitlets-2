@@ -264,8 +264,8 @@ class SyncWindow(QMainWindow):
         self.setCentralWidget(container)
 
         # 连接：UI -> model
-        self.name_input.textChanged.connect(lambda t: setattr(self.model, "name", t))
-        self.age_input.valueChanged.connect(lambda v: setattr(self.model, "age", v))
+        self.name_input.textChanged.connect(self._on_name_input)
+        self.age_input.valueChanged.connect(self._on_age_input)
 
         # 连接：model -> UI (显示)
         self.model.observe(self._update_display, names=["name", "age"]) # 同步状态栏
@@ -277,6 +277,14 @@ class SyncWindow(QMainWindow):
         # 初始化显示
         self._update_display({"name": "init", "new": ""})
 
+    def _on_name_input(self, text):
+        print(f"_on_name_input: {text}")
+        self.model.name = text
+
+    def _on_age_input(self, value):
+        print(f"_on_age_input: {value}")
+        self.model.age = value
+
     def _sync_ui(self, change):
         """当 traitlets 变化时，同步 UI 控件（避免无限循环）"""
         # 注意：这里需要小心处理，避免 UI->model->UI 的无限循环
@@ -287,6 +295,7 @@ class SyncWindow(QMainWindow):
         elif change["name"] == "age":
             if self.age_input.value() != change["new"]:
                 self.age_input.setValue(change["new"])
+  
 
     def _update_display(self, change):
         """更新状态显示"""
@@ -295,6 +304,8 @@ class SyncWindow(QMainWindow):
             f"  姓名: {self.model.name}\n"
             f"  年龄: {self.model.age}"
         )
+        print(f"_update_display")
+
 
     def _demo_change(self):
         """演示通过代码修改 traitlets"""
