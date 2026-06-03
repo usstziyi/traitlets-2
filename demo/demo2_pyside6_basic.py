@@ -116,7 +116,7 @@ class EditablePersonModel(HasTraits):
 
     @default("age")
     def _default_age(self):
-        return 0
+        return 100
 
     @default("score")
     def _default_score(self):
@@ -125,6 +125,11 @@ class EditablePersonModel(HasTraits):
     @default("is_active")
     def _default_is_active(self):
         return False
+
+    @observe("name", "age", "score", "is_active")
+    def _log_change(self, change):
+        """当 model 变化时，记录日志"""
+        print(f"  {change['old']} 变化为 {change['new']}")
 
 
 class EditWindow(QMainWindow):
@@ -217,6 +222,10 @@ class SyncPersonModel(HasTraits):
     def _default_name(self):
         return "匿名"
 
+    @default("age")
+    def _default_age(self):
+        return 100
+
 
 class SyncWindow(QMainWindow):
     """双向联动示例"""
@@ -237,7 +246,6 @@ class SyncWindow(QMainWindow):
 
         # 显示当前模型状态的标签
         self.status_label = QLabel()
-        self.status_label.setStyleSheet("background-color: #f0f0f0; padding: 10px;")
 
         # 演示按钮
         self.demo_btn = QPushButton("演示：代码修改 traitlets")
@@ -260,8 +268,8 @@ class SyncWindow(QMainWindow):
         self.age_input.valueChanged.connect(lambda v: setattr(self.model, "age", v))
 
         # 连接：model -> UI (显示)
-        self.model.observe(self._update_display, names=["name", "age"])
-        self.model.observe(self._sync_ui, names=["name", "age"])
+        self.model.observe(self._update_display, names=["name", "age"]) # 同步状态栏
+        self.model.observe(self._sync_ui, names=["name", "age"]) # 同步控件
 
         # 按钮事件
         self.demo_btn.clicked.connect(self._demo_change)
@@ -308,10 +316,10 @@ def main():
     # window = BasicWindow()
 
     # 示例 2: UI 事件更新 traitlets
-    window = EditWindow()
+    # window = EditWindow()
 
     # 示例 3: 双向联动
-    # window = SyncWindow()
+    window = SyncWindow()
 
     window.show()
     sys.exit(app.exec())
