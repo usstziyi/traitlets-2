@@ -1,0 +1,10 @@
+[project]
+name = "pyside6-traitlets-tutorial"
+version = "0.1.0"
+description = "PySide6 + Traitlets 结合教程，由浅入深学习控件与配置管理"
+requires-python = ">=3.10"
+dependencies = [
+    "PySide6>=6.5.0",
+    "traitlets>=5.9.0",
+]
+
