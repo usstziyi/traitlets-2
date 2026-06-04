@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
     QCheckBox, QComboBox, QTextEdit, QGroupBox, QFormLayout,
     QSlider, QMessageBox
 )
-from PySide6.QtCore import Signal, QObject
+from PySide6.QtCore import Qt, Signal, QObject
 from traitlets import HasTraits, Int, Unicode, Float, Bool, Enum, default, observe
 
 
@@ -325,8 +325,8 @@ class EmployeeFormWindow(QMainWindow):
         # 初始显示
         self._update_json_display()
 
-        # 监听模型上所有 trait 属性的变化
-        # self.model.trait_names() 返回模型上定义的所有 trait 属性的名称列表
+        # 把 整个模型状态 以 JSON 字符串的形式显示到 self.json_label 这个 QLabel 上
+        # 监听模型上所有 trait 属性的变化，和TraitletsBinder无关。
         self.model.observe(self._update_json_display, names=list(self.model.trait_names()))
 
     def _setup_bindings(self):
@@ -406,12 +406,12 @@ class SliderWindow(QMainWindow):
 
         # 滑块
         self.slider = QSlider()
-        self.slider.setOrientation(1)  # 水平
+        self.slider.setOrientation(Qt.Orientation.Horizontal)
         self.slider.setRange(0, 100)
 
         # 显示
         self.display = QLabel()
-        self.display.setAlignment(8)  # 居中
+        self.display.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.display.setStyleSheet("font-size: 24px; font-weight: bold;")
 
         # 布局
@@ -424,7 +424,8 @@ class SliderWindow(QMainWindow):
         self.setCentralWidget(container)
 
         # 绑定
-        TraitletsBinder(self.model).bind("value", self.slider, "value", "valueChanged")
+        self._binder = TraitletsBinder(self.model)
+        self._binder.bind("value", self.slider, "value", "valueChanged")
 
         # 显示绑定
         self.model.observe(self._update_display, names=["label"])
