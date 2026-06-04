@@ -541,10 +541,10 @@ def main():
     app = QApplication(sys.argv)
 
     # 列表示例
-    window = DataWindow()
+    # window = DataWindow()
 
     # 验证示例
-    # window = ValidationWindow()
+    window = ValidationWindow()
 
     # 动态表单示例
     # window = DynamicFormWindow()
