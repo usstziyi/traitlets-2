@@ -164,7 +164,7 @@ class TraitletsBinder:
 
 
 # ============================================================
-# 2. 便捷绑定函数
+# 2. 便捷绑定函数：这三个是 TraitletsBinder 的 便捷封装函数 ，为常见控件类型预设了正确的参数，减少重复代码。
 # ============================================================
 
 def bind_text(model: HasTraits, trait_name: str, line_edit: QLineEdit):
