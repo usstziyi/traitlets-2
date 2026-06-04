@@ -54,6 +54,8 @@ class DataModel(HasTraits):
     def add_tag(self, tag: str):
         """添加标签"""
         if tag and tag not in self.tags:
+            # 创建一个 全新的列表对象 ，内容是原列表的所有元素 + 新标签
+            # 将这个新列表赋值给 self.tags ，这会触发 traitlets 的 setter 机制 ，从而发出变更通知
             self.tags = self.tags + [tag]
 
     def remove_tag(self, tag: str):
@@ -63,6 +65,8 @@ class DataModel(HasTraits):
 
     def set_score(self, subject: str, score: float):
         """设置分数"""
+        # traitlets 的 Dict 类型 无法检测到 self.scores["数学"] = 95 这种原地修改
+        # 必须通过赋值一个全新对象来触发变更通知机制
         new_scores = dict(self.scores)
         new_scores[subject] = score
         self.scores = new_scores
