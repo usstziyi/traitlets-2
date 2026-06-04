@@ -379,19 +379,10 @@ class EmployeeFormWindow(QMainWindow):
 class SliderModel(HasTraits):
     """滑块演示模型"""
     value = Int()
-    label = Unicode()
 
     @default("value")
     def _default_value(self):
         return 50
-
-    @default("label")
-    def _default_label(self):
-        return "数值: 50"
-
-    @observe("value")
-    def _update_label(self, change):
-        self.label = f"数值: {change['new']}"
 
 
 class SliderWindow(QMainWindow):
@@ -426,13 +417,7 @@ class SliderWindow(QMainWindow):
         # 绑定
         self._binder = TraitletsBinder(self.model)
         self._binder.bind("value", self.slider, "value", "valueChanged")
-
-        # 显示绑定
-        self.model.observe(self._update_display, names=["label"])
-        self._update_display()
-
-    def _update_display(self, change=None):
-        self.display.setText(self.model.label)
+        self._binder.bind("value", self.display, "text", "linkActivated", to_widget_func=lambda v: f"percent: {v}%")
 
 
 # ============================================================
@@ -443,10 +428,10 @@ def main():
     app = QApplication(sys.argv)
 
     # 表单示例（推荐先看这个）
-    window = EmployeeFormWindow()
+    # window = EmployeeFormWindow()
 
     # 滑块示例
-    # window = SliderWindow()
+    window = SliderWindow()
 
     window.show()
     sys.exit(app.exec())
@@ -454,3 +439,28 @@ def main():
 
 if __name__ == "__main__":
     main()
+"""
+用户拖动滑块 (50 → 70)
+    │
+    ▼
+QSlider 发出 valueChanged(70)
+    │
+    ▼
+TraitletsBinder._on_widget_change("value", 70, from_func=None)
+    │  setattr(self.model, "value", 70)
+    ▼
+model.value = 70
+    │
+    ├──► observe("value") — 第一条 bind
+    │       _on_model_change(slider, "value", change, to_func=None)
+    │       → slider.setValue(70)
+    │       → Qt 内部等值判断：滑块已是 70，不重复发射信号 ✅
+    │
+    └──► observe("value") — 第二条 bind
+            _on_model_change(display, "text", change, to_func=lambda v: f"数值: {v}")
+            → change["new"] = 70
+            → to_func(70) → "数值: 70"
+            → display.setText("数值: 70")
+            ▼
+        QLabel 显示 "数值: 70"  ← 界面更新完成
+"""
