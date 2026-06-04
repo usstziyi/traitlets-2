@@ -416,7 +416,7 @@ class SliderWindow(QMainWindow):
 
         # 绑定
         self._binder = TraitletsBinder(self.model)
-        self._binder.bind("value", self.slider, "value", "valueChanged")
+        self._binder.bind("value", self.slider, "value", "valueChanged", to_widget_func=lambda v: v)
         self._binder.bind("value", self.display, "text", "linkActivated", to_widget_func=lambda v: f"percent: {v}%")
 
 
