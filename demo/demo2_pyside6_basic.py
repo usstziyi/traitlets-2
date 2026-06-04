@@ -216,15 +216,10 @@ class EditWindow(QMainWindow):
 class SyncPersonModel(HasTraits):
     """同步模型：带有验证"""
     name = Unicode()
-    age = Int()
 
     @default("name")
     def _default_name(self):
         return "匿名"
-
-    @default("age")
-    def _default_age(self):
-        return 100
 
 
 class SyncWindow(QMainWindow):
@@ -241,12 +236,6 @@ class SyncWindow(QMainWindow):
         self.name_input = QLineEdit()
         self.name_input.setPlaceholderText("输入姓名")
 
-        self.age_input = QSpinBox()
-        self.age_input.setRange(0, 150)
-
-        # 显示当前模型状态的标签
-        self.status_label = QLabel()
-
         # 演示按钮
         self.demo_btn = QPushButton("演示：代码修改 traitlets")
 
@@ -254,64 +243,50 @@ class SyncWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.addWidget(QLabel("姓名:"))
         layout.addWidget(self.name_input)
-        layout.addWidget(QLabel("年龄:"))
-        layout.addWidget(self.age_input)
         layout.addWidget(self.demo_btn)
-        layout.addWidget(self.status_label)
 
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
 
         # 连接：UI -> model
-        self.name_input.textChanged.connect(self._on_name_input)
-        self.age_input.valueChanged.connect(self._on_age_input)
-
-        # 连接：model -> UI (显示)
-        self.model.observe(self._update_display, names=["name", "age"]) # 同步状态栏
-        self.model.observe(self._sync_ui, names=["name", "age"]) # 同步控件
+        self.name_input.textChanged.connect(self.ui_to_model)
+        # 连接：model -> UI
+        self.model.observe(self.model_to_ui, names=["name"]) # 同步控件
 
         # 按钮事件
-        self.demo_btn.clicked.connect(self._demo_change)
+        self.demo_btn.clicked.connect(self.button_set_model)
 
-        # 初始化显示
-        self._update_display({"name": "init", "new": ""})
 
-    def _on_name_input(self, text):
-        print(f"_on_name_input: {text}")
-        self.model.name = text
+    def ui_to_model(self, text):
+        print(f"[外]ui->model, 姓名: {text}")
+        # traitlets自带守卫，重复值不会触发通知
+        # 但是这里为了避免再次赋值，我们手动添加一个守卫
+        # 检测old和new是否相同
+        if self.model.name != text:
+            print("[内]更新model姓名")
+            self.model.name = text
 
-    def _on_age_input(self, value):
-        print(f"_on_age_input: {value}")
-        self.model.age = value
 
-    def _sync_ui(self, change):
-        """当 traitlets 变化时，同步 UI 控件（避免无限循环）"""
-        # 注意：这里需要小心处理，避免 UI->model->UI 的无限循环
+    def model_to_ui(self, change):
         # 在实际项目中，通常使用更智能的绑定方式
+        print(f"[外]model->ui, 姓名: {change['new']}")
         if change["name"] == "name":
+            # 其实qt自带守卫,对相同值不会发射信号，但是setText会执行
+            # 所以这里人为添加守卫是避免了再次setText
             if self.name_input.text() != change["new"]:
+                print("[内]setText")
                 self.name_input.setText(change["new"])
-        elif change["name"] == "age":
-            if self.age_input.value() != change["new"]:
-                self.age_input.setValue(change["new"])
   
 
-    def _update_display(self, change):
-        """更新状态显示"""
-        self.status_label.setText(
-            f"当前模型状态:\n"
-            f"  姓名: {self.model.name}\n"
-            f"  年龄: {self.model.age}"
-        )
-        print(f"_update_display")
-
-
-    def _demo_change(self):
-        """演示通过代码修改 traitlets"""
-        self.model.name = "李四"
-        self.model.age = 30
-
+    def button_set_model(self):
+        print("[外]button_set_model")
+        # traitlets自带守卫，重复值不会触发通知
+        # 但是这里为了避免再次赋值，我们手动添加一个守卫
+        # 检测old和new是否相同
+        if self.model.name != "李四":
+            print("[内]更新model姓名")
+            self.model.name = "李四"
 
 # ============================================================
 # 主函数
