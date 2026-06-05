@@ -371,11 +371,9 @@ class MainWindow(QMainWindow):
         # UI
         self.status_label = QLabel()
         self.status_label.setWordWrap(True)
-        self.status_label.setStyleSheet("background-color: #f0f0f0; padding: 15px; font-size: 14px;")
 
         self.config_display = QTextEdit()
         self.config_display.setReadOnly(True)
-        self.config_display.setStyleSheet("font-family: monospace; font-size: 12px;")
 
         # 按钮
         self.settings_btn = QPushButton("打开设置")
@@ -559,8 +557,8 @@ def test_config_base():
     for name, info in config.get_traits_info().items():
         print(f"   {name}: {info}")
 
-    # 清理测试文件
-    Path("test_config.json").unlink(missing_ok=True)
+    # 从目录中删除测试文件
+    # Path("test_config.json").unlink(missing_ok=True)
 
     print("\n" + "=" * 60)
     print("ConfigBase 测试完成！")
@@ -573,7 +571,7 @@ def test_config_base():
 
 def main():
     # 首先运行配置测试
-    test_config_base()
+    # test_config_base()
 
     # 然后启动 GUI
     print("\n启动 GUI 应用...\n")
