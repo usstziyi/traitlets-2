@@ -88,6 +88,7 @@ class DataWindow(QMainWindow):
         # 输入框
         self.tag_input = QLineEdit()
         self.tag_input.setPlaceholderText("输入标签并回车")
+        # 当用户在 tag_input 输入框中按下回车键时，发送信号
         self.tag_input.returnPressed.connect(self._add_tag)
 
         self.add_btn = QPushButton("添加")
@@ -202,9 +203,10 @@ class FormModel(HasTraits):
     age = Int()
     agreement = Bool()
 
+    # traitlets 的设计选择——默认值被视为"可信的内部值"，验证器只守卫外部输入。
     @default("username")
     def _default_username(self):
-        return ""
+        return "1"
 
     @default("password")
     def _default_password(self):
@@ -226,6 +228,7 @@ class FormModel(HasTraits):
     def _default_agreement(self):
         return False
 
+    # @validate 只在 __set__ → set() → _validate() 这条路径上被调用
     @validate("username")
     def _validate_username(self, proposal):
         value = proposal["value"]
@@ -341,7 +344,7 @@ class ValidationWindow(QMainWindow):
         container.setLayout(main_layout)
         self.setCentralWidget(container)
 
-        # 绑定
+        # 绑定ui->model
         self.username_input.textChanged.connect(self._on_username)
         self.password_input.textChanged.connect(self._on_password)
         self.password_confirm_input.textChanged.connect(self._on_password_confirm)
@@ -353,6 +356,13 @@ class ValidationWindow(QMainWindow):
         self.model.observe(self._on_error, names=[
             "username", "password", "password_confirm", "email", "age"
         ])
+        
+        # traitlets 的设计选择——默认值被视为"可信的内部值"，验证器只守卫外部输入。
+        try:
+            _name = self.model.username
+            print(f"成功: {_name!r}")
+        except TraitError as e:
+            print(f"确认触发了验证器: {e}")
 
     def _on_username(self, text):
         try:
@@ -363,6 +373,7 @@ class ValidationWindow(QMainWindow):
 
     def _on_password(self, text):
         try:
+            # 接着触发validate验证器
             self.model.password = text
             self.error_label.clear()
         except TraitError as e:
@@ -393,6 +404,7 @@ class ValidationWindow(QMainWindow):
         self.model.agreement = checked
 
     def _on_error(self, change):
+        print(change)
         pass  # 错误已经在输入时处理
 
     def _submit(self):
