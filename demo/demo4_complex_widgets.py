@@ -182,7 +182,12 @@ class DataWindow(QMainWindow):
             score_item.setFlags(score_item.flags() & ~Qt.ItemIsEditable)
             self.score_table.setItem(row, 1, score_item)
 
+    # 方法签名中带有 change=None 参数。这是因为该方法既可以被手动调用（如初始化时 
+    # self._update_json() ），也可以作为 traitlets 的 observe 回调 被触发。
+    # 当作为 observe 回调时，traitlets 会自动传入一个 change 字典
+    # （包含旧值、新值等信息），这里用默认值 None 兼容了两种调用方式。
     def _update_json(self, change=None):
+        # 构建一个普通字典
         data = {
             "tags": self.model.tags,
             "scores": self.model.scores,
