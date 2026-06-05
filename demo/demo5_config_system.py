@@ -116,10 +116,12 @@ class AppConfig(ConfigBase):
     然后用一个总配置类组合起来。
     """
     general = Unicode().tag(description="通用配置(JSON)")
-    network = Unicode().tag(description="网络配置(JSON)")
+    network = Unicode[str, str | bytes]().tag(description="网络配置(JSON)")
 
     @default("general")
     def _default_general(self):
+        # json.dumps() 不认识自定义对象
+        # json.dumps() 只能序列化 Python 的 内置类型
         return json.dumps(GeneralConfig().to_dict(), ensure_ascii=False)
 
     @default("network")
