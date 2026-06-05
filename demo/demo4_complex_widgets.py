@@ -532,6 +532,7 @@ class DynamicFormWindow(QMainWindow):
         self._update_json()
 
     def _update_json(self, change=None):
+        # json.dumps() 方法将字典转换为 JSON 字符串
         self.json_display.setText(json.dumps(self.model.settings, indent=2, ensure_ascii=False))
 
     def _init_widgets(self):
