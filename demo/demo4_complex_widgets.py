@@ -479,11 +479,13 @@ class DynamicFormWindow(QMainWindow):
         self.setCentralWidget(container)
 
         # 初始化显示
-        self._init_widgets()
-        self._update_json()
+        self._init_widgets() # 获取当前model值，初始化控件
+        self._update_json() # 获取当前model值，更新json显示
 
-        # 监听变化
+        # 监听model变化，更新json显示
         self.model.observe(self._on_settings_change, names=["settings"])
+
+        # 控件变化由qt事件监控，触发qt槽函数，参函数里更新model值
 
     def _create_widget(self, field):
         """根据字段类型创建控件"""
@@ -519,7 +521,7 @@ class DynamicFormWindow(QMainWindow):
         """更新设置"""
         new_settings = dict(self.model.settings)
         new_settings[key] = value
-        self.model.settings = new_settings
+        self.model.settings = new_settings # 触发 @observe 执行 _on_settings_change
 
     def _on_settings_change(self, change):
         self._update_json()
@@ -533,6 +535,7 @@ class DynamicFormWindow(QMainWindow):
         for field in self.form_definition:
             key = field["key"]
             widget = self.widgets[key]
+            # 获取当前model值
             value = settings.get(key)
 
             if field["type"] == "combo":
@@ -556,10 +559,10 @@ def main():
     # window = DataWindow()
 
     # 验证示例
-    window = ValidationWindow()
+    # window = ValidationWindow()
 
     # 动态表单示例
-    # window = DynamicFormWindow()
+    window = DynamicFormWindow()
 
     window.show()
     sys.exit(app.exec())
