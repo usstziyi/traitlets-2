@@ -144,9 +144,7 @@ class AppConfig(ConfigBase):
         """从字典加载，将展开的 dict 转回 JSON 字符串"""
         if "general" in data and isinstance(data["general"], dict):
             # dict 转换为 JSON 字符串
-            print(data["general"])
             data["general"] = json.dumps(data["general"], ensure_ascii=False)
-            print(data["general"])
         if "network" in data and isinstance(data["network"], dict):
             # dict 转换为 JSON 字符串
             data["network"] = json.dumps(data["network"], ensure_ascii=False)
