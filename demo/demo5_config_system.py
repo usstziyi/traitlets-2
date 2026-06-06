@@ -121,30 +121,35 @@ class AppConfig(ConfigBase):
     @default("general")
     def _default_general(self):
         # json.dumps() 不认识自定义对象
-        # json.dumps() 只能序列化 Python 的 内置类型
+        # json.dumps() 只能序列化 Python 的 内置类型，比如这里的dict
+        # 父类和子类的 trait 会混在一起，按名称字母顺序排列
         return json.dumps(GeneralConfig().to_dict(), ensure_ascii=False)
 
     @default("network")
     def _default_network(self):
         return json.dumps(NetworkConfig().to_dict(), ensure_ascii=False)
 
-    # 便捷方法
+
+    # 通过json构造通用配置对象
     def get_general_config(self) -> GeneralConfig:
         """获取通用配置对象"""
         config = GeneralConfig()
         config.from_json(self.general)
         return config
 
+    # 把通用配置对象转换为json字符串
     def set_general_config(self, config: GeneralConfig):
         """设置通用配置"""
         self.general = config.to_json(indent=2)
 
+    # 通过json构造网络配置对象
     def get_network_config(self) -> NetworkConfig:
         """获取网络配置对象"""
         config = NetworkConfig()
         config.from_json(self.network)
         return config
 
+    # 把网络配置对象转换为json字符串
     def set_network_config(self, config: NetworkConfig):
         """设置网络配置"""
         self.network = config.to_json(indent=2)
@@ -367,7 +372,7 @@ class MainWindow(QMainWindow):
         self.config = config
         self.config_file = "config.json"
 
-        # 尝试加载配置
+        # 加载配置到内存self.config
         self._load_config()
 
         # UI
@@ -408,21 +413,21 @@ class MainWindow(QMainWindow):
         container.setLayout(main_layout)
         self.setCentralWidget(container)
 
-        # 更新显示
+        # 把默认配置显示在UI
         self._update_display()
 
     def _load_config(self):
-        """加载配置"""
+        # 第二次运行，从配置文件加载配置到内存self.config
         if Path(self.config_file).exists():
             self.config.load_from_file(self.config_file)
             print(f"配置已从 {self.config_file} 加载")
         else:
-            # 首次运行，创建默认配置
+            # 首次运行，创建默认配置并保存到文件self.config_file
             self.config.save_to_file(self.config_file)
             print(f"默认配置已保存到 {self.config_file}")
 
     def _update_display(self):
-        """更新显示"""
+        # 此时self.config已经加载了配置，所以可以直接获取配置
         general = self.config.get_general_config()
         network = self.config.get_network_config()
 
@@ -433,6 +438,7 @@ class MainWindow(QMainWindow):
             f"超时: {network.timeout}s | 重试: {network.retry_count}次"
         )
 
+        # 通过general和network对象能够拿到内部的属性值，而不是一个长的字符串
         full_config = {
             "general": general.to_dict(),
             "network": network.to_dict(),
