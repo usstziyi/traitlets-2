@@ -137,7 +137,6 @@ class ConfigBase(HasTraits):
         path.parent.mkdir(parents=True, exist_ok=True)
 
         json_str = self.to_json(indent=indent)
-        print(json_str)
         path.write_text(json_str, encoding="utf-8")
 
         return str(path)
@@ -161,6 +160,7 @@ class ConfigBase(HasTraits):
             raise FileNotFoundError(f"配置文件不存在: {path}")
 
         json_str = path.read_text(encoding="utf-8")
+
         self.from_json(json_str)
 
         return str(path)

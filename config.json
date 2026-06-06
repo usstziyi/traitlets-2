@@ -1,5 +1,20 @@
 {
   "config_path": "config.json",
-  "general": "{\"app_name\": \"我的应用\", \"auto_start\": false, \"config_path\": \"\", \"font_size\": 14, \"language\": \"zh_CN\", \"theme\": \"light\"}",
-  "network": "{\"config_path\": \"\", \"port\": 8080, \"proxy_url\": \"\", \"retry_count\": 3, \"server_url\": \"https://api.example.com\", \"timeout\": 30, \"use_proxy\": false}"
+  "general": {
+    "app_name": "我的应用",
+    "auto_start": false,
+    "config_path": "",
+    "font_size": 14,
+    "language": "zh_CN",
+    "theme": "light"
+  },
+  "network": {
+    "config_path": "",
+    "port": 8080,
+    "proxy_url": "",
+    "retry_count": 3,
+    "server_url": "https://api.example.com",
+    "timeout": 30,
+    "use_proxy": false
+  }
 }

@@ -120,36 +120,54 @@ class AppConfig(ConfigBase):
 
     @default("general")
     def _default_general(self):
-        # json.dumps() 不认识自定义对象
-        # json.dumps() 只能序列化 Python 的 内置类型，比如这里的dict
-        # 父类和子类的 trait 会混在一起，按名称字母顺序排列
         return json.dumps(GeneralConfig().to_dict(), ensure_ascii=False)
 
     @default("network")
     def _default_network(self):
         return json.dumps(NetworkConfig().to_dict(), ensure_ascii=False)
+    
+    # 重写 to_dict 方法，将 general 和 network 转换为 dict 而不是 JSON 字符串
+    def to_dict(self, include_private: bool = False) -> dict[str, Any]:
+        """导出为字典，子配置展开为嵌套 dict 而非 JSON 字符串"""
+        result = super().to_dict(include_private=include_private)
+        # 将 JSON 字符串反序列化为 dict，避免双重编码导致转义符
+        if "general" in result and isinstance(result["general"], str):
+            # str 转换为 dict
+            result["general"] = json.loads(result["general"])
+        if "network" in result and isinstance(result["network"], str):
+            # str 转换为 dict
+            result["network"] = json.loads(result["network"])
+        return result
 
+    # 重写 from_dict 方法，将 general 和 network 转换为 JSON 字符串
+    def from_dict(self, data: dict[str, Any], strict: bool = False) -> None:
+        """从字典加载，将展开的 dict 转回 JSON 字符串"""
+        if "general" in data and isinstance(data["general"], dict):
+            # dict 转换为 JSON 字符串
+            print(data["general"])
+            data["general"] = json.dumps(data["general"], ensure_ascii=False)
+            print(data["general"])
+        if "network" in data and isinstance(data["network"], dict):
+            # dict 转换为 JSON 字符串
+            data["network"] = json.dumps(data["network"], ensure_ascii=False)
+        super().from_dict(data, strict=strict)
 
-    # 通过json构造通用配置对象
     def get_general_config(self) -> GeneralConfig:
         """获取通用配置对象"""
         config = GeneralConfig()
         config.from_json(self.general)
         return config
 
-    # 把通用配置对象转换为json字符串
     def set_general_config(self, config: GeneralConfig):
         """设置通用配置"""
         self.general = config.to_json(indent=2)
 
-    # 通过json构造网络配置对象
     def get_network_config(self) -> NetworkConfig:
         """获取网络配置对象"""
         config = NetworkConfig()
         config.from_json(self.network)
         return config
 
-    # 把网络配置对象转换为json字符串
     def set_network_config(self, config: NetworkConfig):
         """设置网络配置"""
         self.network = config.to_json(indent=2)
