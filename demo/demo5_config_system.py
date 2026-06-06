@@ -27,7 +27,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer
 from traitlets import (
-    HasTraits, Int, Unicode, Float, Bool, List, default, observe, validate, TraitError
+    HasTraits, Int, Unicode, Float, Bool, List, Dict, default, observe, validate, TraitError
 )
 
 # 导入配置基类
@@ -115,60 +115,36 @@ class AppConfig(ConfigBase):
     这是实际应用中的推荐做法：将配置按功能拆分为多个类，
     然后用一个总配置类组合起来。
     """
-    general = Unicode().tag(description="通用配置(JSON)")
-    network = Unicode[str, str | bytes]().tag(description="网络配置(JSON)")
+    general = Dict().tag(description="通用配置")
+    network = Dict().tag(description="网络配置")
 
     @default("general")
     def _default_general(self):
-        return json.dumps(GeneralConfig().to_dict(), ensure_ascii=False)
+        return GeneralConfig().to_dict()
 
     @default("network")
     def _default_network(self):
-        return json.dumps(NetworkConfig().to_dict(), ensure_ascii=False)
-    
-    # 重写 to_dict 方法，将 general 和 network 转换为 dict 而不是 JSON 字符串
-    def to_dict(self, include_private: bool = False) -> dict[str, Any]:
-        """导出为字典，子配置展开为嵌套 dict 而非 JSON 字符串"""
-        result = super().to_dict(include_private=include_private)
-        # 将 JSON 字符串反序列化为 dict，避免双重编码导致转义符
-        if "general" in result and isinstance(result["general"], str):
-            # str 转换为 dict
-            result["general"] = json.loads(result["general"])
-        if "network" in result and isinstance(result["network"], str):
-            # str 转换为 dict
-            result["network"] = json.loads(result["network"])
-        return result
-
-    # 重写 from_dict 方法，将 general 和 network 转换为 JSON 字符串
-    def from_dict(self, data: dict[str, Any], strict: bool = False) -> None:
-        """从字典加载，将展开的 dict 转回 JSON 字符串"""
-        if "general" in data and isinstance(data["general"], dict):
-            # dict 转换为 JSON 字符串
-            data["general"] = json.dumps(data["general"], ensure_ascii=False)
-        if "network" in data and isinstance(data["network"], dict):
-            # dict 转换为 JSON 字符串
-            data["network"] = json.dumps(data["network"], ensure_ascii=False)
-        super().from_dict(data, strict=strict)
+        return NetworkConfig().to_dict()
 
     def get_general_config(self) -> GeneralConfig:
         """获取通用配置对象"""
         config = GeneralConfig()
-        config.from_json(self.general)
+        config.from_dict(self.general)
         return config
 
     def set_general_config(self, config: GeneralConfig):
         """设置通用配置"""
-        self.general = config.to_json(indent=2)
+        self.general = config.to_dict()
 
     def get_network_config(self) -> NetworkConfig:
         """获取网络配置对象"""
         config = NetworkConfig()
-        config.from_json(self.network)
+        config.from_dict(self.network)
         return config
 
     def set_network_config(self, config: NetworkConfig):
         """设置网络配置"""
-        self.network = config.to_json(indent=2)
+        self.network = config.to_dict()
 
 
 # ============================================================
