@@ -20,7 +20,7 @@ import sys
 import json
 from pathlib import Path
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QApplication, QMainWindow, QDialog, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox,
     QCheckBox, QComboBox, QTextEdit, QGroupBox, QFormLayout,
     QFileDialog, QMessageBox, QTabWidget, QListWidget, QSplitter
@@ -151,7 +151,7 @@ class AppConfig(ConfigBase):
 # 2. 设置对话框
 # ============================================================
 
-class SettingsDialog(QMainWindow):
+class SettingsDialog(QDialog):
     """设置对话框"""
 
     def __init__(self, config: AppConfig):
@@ -187,10 +187,7 @@ class SettingsDialog(QMainWindow):
         main_layout = QVBoxLayout()
         main_layout.addWidget(tab_widget)
         main_layout.addLayout(btn_layout)
-
-        container = QWidget()
-        container.setLayout(main_layout)
-        self.setCentralWidget(container)
+        self.setLayout(main_layout)
 
     def _create_general_tab(self):
         """创建通用设置标签页"""
