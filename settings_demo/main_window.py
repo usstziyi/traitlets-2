@@ -138,9 +138,10 @@ class MainWindow(QMainWindow):
             QMessageBox.Yes | QMessageBox.No
         )
         if reply == QMessageBox.Yes:
-            # 创建新的默认配置
+            # 创建了一个 新的实例 ，所有 trait 都是默认值。
             default_config = AppConfig()
             default_config.save_to_file(self.config_file)
             self.config.load_from_file(self.config_file)
+            # self.config.load_from_dict(default_config.to_dict())
             self._update_display()
             QMessageBox.information(self, "提示", "配置已重置为默认值")
