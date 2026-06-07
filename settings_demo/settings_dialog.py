@@ -132,7 +132,6 @@ class SettingsDialog(QDialog):
 
         self.json_display = QTextEdit()
         self.json_display.setReadOnly(True)
-        self.json_display.setStyleSheet("font-family: monospace; font-size: 12px;")
         layout.addWidget(self.json_display)
 
         tab.setLayout(layout)
