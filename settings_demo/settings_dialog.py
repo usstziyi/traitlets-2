@@ -6,6 +6,7 @@
 """
 
 import json
+from socketserver import DatagramRequestHandler
 from PySide6.QtWidgets import (
     QDialog, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QSpinBox,
@@ -25,6 +26,7 @@ class SettingsDialog(QDialog):
         self.resize(550, 450)
 
         self.config = config
+        # 从内存中获取配置对象
         self.general_config = config.get_general_config()
         self.network_config = config.get_network_config()
 

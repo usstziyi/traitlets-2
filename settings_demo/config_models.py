@@ -97,22 +97,26 @@ class AppConfig(ConfigBase):
     def _default_network(self):
         return NetworkConfig().to_dict()
 
+    # 从内存中获取配置对象
     def get_general_config(self) -> GeneralConfig:
         """获取通用配置对象"""
         config = GeneralConfig()
         config.from_dict(self.general)
         return config
-
+    
+    # 设置配置内存中的通用配置
     def set_general_config(self, config: GeneralConfig):
         """设置通用配置"""
         self.general = config.to_dict()
 
+    # 从内存中获取配置对象
     def get_network_config(self) -> NetworkConfig:
         """获取网络配置对象"""
         config = NetworkConfig()
         config.from_dict(self.network)
         return config
-
+    
+    # 设置配置内存中的网络配置
     def set_network_config(self, config: NetworkConfig):
         """设置网络配置"""
         self.network = config.to_dict()

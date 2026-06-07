@@ -1,7 +1,7 @@
 {
   "config_path": "config.json",
   "general": {
-    "app_name": "MyAppssss",
+    "app_name": "我的应用",
     "auto_start": false,
     "config_path": "",
     "font_size": 14,
